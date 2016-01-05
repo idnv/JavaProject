@@ -27,10 +27,12 @@ public class MyModel extends Observable implements Model {
 	private HashMap<String, Solution<Position>> solutionsHashMap;
 	private HashMap<Maze3d, Solution<Position>> cach;
 	private ExecutorService threadPool;
+	Properties propertiesFromXMLFile;
 	public MyModel(Properties properties) {
 		this.cach = new HashMap<Maze3d, Solution<Position>>();
 		this.mazeHashMap = new HashMap<String, Maze3d>();
 		this.solutionsHashMap = new HashMap<String, Solution<Position>>();
+		this.propertiesFromXMLFile = properties;
 		this.threadPool = Executors.newFixedThreadPool(properties.getNumOfThreadsInThreadPool());
 	}
 	
@@ -52,7 +54,7 @@ public class MyModel extends Observable implements Model {
 			threadPool.execute(new Runnable() {
 				@Override
 				public void run() {
-					mazeHashMap.put(mazeName, mg.generate(floor, row, column));
+					mazeHashMap.put(mazeName, mg.generate(column, row, floor));
 					setChanged();
 					notifyObservers("the maze " + mazeName + " has created");
 				}
@@ -159,6 +161,9 @@ public class MyModel extends Observable implements Model {
 			Maze3d maze = mazeHashMap.get(mazeName);
 			Searcher<Position> s;
 			
+			if(!algorithm.equals("BFS") && !algorithm.equals("mazeAirDistance") && !algorithm.equals("mazeManhattanDistance"))
+				 algorithm = this.propertiesFromXMLFile.getDefaultSolver();
+			
 			switch (algorithm) {
 			case "BFS":
 				s = new BFS<Position>();	
@@ -181,7 +186,7 @@ public class MyModel extends Observable implements Model {
 						cach.put(mazeHashMap.get(mazeName), sol);
 						solutionsHashMap.put(mazeName, sol);
 						clearChanged();
-						notifyObservers("the solution with " + algorithm + "alorithm of maze "+ mazeName +" has been created");
+						notifyObservers("solution for " + mazeName +" is ready");
 					}
 				}).start();
 	}

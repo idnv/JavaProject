@@ -16,6 +16,7 @@ import presenter.MyPresenter;
 import presenter.Presenter;
 import presenter.Properties;
 import view.CLI;
+import view.MainWindow;
 import view.MyView;
 import view.View;
 
@@ -48,7 +49,12 @@ public class Run {
 			view.start();
 		}
 		if(properties.getView().equals("GUI")){
-			
+			Model model = new MyModel(properties);
+			View view = new MainWindow("My Game", 500, 500);
+			Presenter presenter = new MyPresenter(model, view);
+			((Observable)view).addObserver(presenter);
+			((Observable)model).addObserver(presenter);
+			view.start();
 		}
 	}
 
