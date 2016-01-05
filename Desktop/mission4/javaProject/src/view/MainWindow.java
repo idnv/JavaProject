@@ -12,6 +12,7 @@ import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.widgets.FileDialog;
+import org.eclipse.swt.widgets.MessageBox;
 
 import algorithms.mazeGenerators.Maze3d;
 import algorithms.mazeGenerators.Position;
@@ -80,6 +81,21 @@ public class MainWindow extends Observable implements View {
 			}
 		});
 		
+		// set save maze Listener
+		this.mazeWindoe.setSaveMazeListener(new SelectionListener() {
+			
+			@Override
+			public void widgetSelected(SelectionEvent arg0) {
+					
+			}
+			
+			@Override
+			public void widgetDefaultSelected(SelectionEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+		});
+		
 		// set load maze Listener
 		this.mazeWindoe.setLoadMazeListener(new SelectionListener() {
 			
@@ -99,6 +115,7 @@ public class MainWindow extends Observable implements View {
 				
 			}
 		});
+		
 		// generate maze listener
 		this.mazeWindoe.setGenerateMazeListener(new SelectionListener() {
 			
@@ -189,7 +206,7 @@ public class MainWindow extends Observable implements View {
 			notifyObservers(args);
 		}
 		// case new solution had calculated
-		if(str.startsWith("solution for ") && str.endsWith(" is ready")){
+		else if(str.startsWith("solution for ") && str.endsWith(" is ready")){
 			String mazeName = str.split(" ")[2];
 			ArrayList<String> args = new ArrayList<String>();
 			args.add("display solution");
@@ -198,7 +215,7 @@ public class MainWindow extends Observable implements View {
 			notifyObservers(args);
 		}
 		// case allowd charcter movement reques
-		if(str.startsWith("the movement ") && str.endsWith(" is allowd")){
+		else if(str.startsWith("the movement ") && str.endsWith(" is allowd")){
 			String wantedMovement = str.split(" ")[2];
 			Position charcterCurrentPos = mazeWindoe.getCharchterPosition();
 			if(wantedMovement.equals("up")){
@@ -215,10 +232,12 @@ public class MainWindow extends Observable implements View {
 			args.add(mazeWindoe.getMazeName());
 			setChanged();
 			notifyObservers(args);
-			
-				
 			}
+		else{
+			mazeWindoe.messageToUser(str);
 		}
+		
+	}
 
 	@Override
 	public void displayMatrix(int[][] matrix) {

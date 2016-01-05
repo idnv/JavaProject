@@ -18,6 +18,7 @@ import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Menu;
 import org.eclipse.swt.widgets.MenuItem;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.ToolBar;
 
 import algorithms.mazeGenerators.Maze3d;
@@ -215,6 +216,19 @@ public class MazeWindow extends BasicWindow {
 			}
 		});
 		
+	}
+	
+	public void messageToUser(String eror){
+		display.getCurrent().syncExec(new Runnable() {
+			
+			@Override
+			public void run() {
+				MessageBox errorBox =  new MessageBox(shell, SWT.ICON_ERROR); 
+				errorBox.setMessage(eror);
+				errorBox.setText("Error");
+				errorBox.open();				
+			}
+		});
 	}
 
 	public void newGeneratedSolution(ArrayList<State<Position>> arr){

@@ -7,6 +7,7 @@ import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
 import org.eclipse.swt.widgets.Label;
+import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
@@ -16,7 +17,6 @@ public class MazeProperties extends BasicWindow {
 	
 	public MazeProperties(String title, int width, int height, Shell parent) {
 		super(title, width, height, parent);
-		// TODO Auto-generated constructor stub
 	}
 	
 	
@@ -66,15 +66,17 @@ public class MazeProperties extends BasicWindow {
 					@Override
 					public void widgetSelected(SelectionEvent arg0) {
 						
-						if(!numberOfFloorsData.getText().equals("") && !numberOfRowsData.getText().equals("") && !numberOfColumnsData.getText().equals("") && !mazeNameData.getText().equals("")){
+						if(!numberOfFloorsData.getText().equals("") && !numberOfRowsData.getText().equals("") && !numberOfColumnsData.getText().equals("") && !mazeNameData.getText().equals(" ")){
 							numOfColumns =  numberOfColumnsData.getText();
 							numOfFloors = numberOfFloorsData.getText();
 							numOfRows = numberOfRowsData.getText();
 							mazeName = mazeNameData.getText();
 						}
+						else{
+							setEror("All fields should be filled");
+						}	
 						shell.close();
 					}
-					
 					@Override
 					public void widgetDefaultSelected(SelectionEvent arg0) {
 						// TODO Auto-generated method stub
@@ -114,6 +116,17 @@ public class MazeProperties extends BasicWindow {
 	public String getNumOfFloors() {
 		return numOfFloors;
 	}
-
+	private void setEror(String eror){
+		display.getCurrent().syncExec(new Runnable() {
+			
+			@Override
+			public void run() {
+				MessageBox errorBox =  new MessageBox(shell, SWT.ICON_ERROR); 
+				errorBox.setMessage(eror);
+				errorBox.setText("Error");
+				errorBox.open();				
+			}
+		});
+	}
 	
 }

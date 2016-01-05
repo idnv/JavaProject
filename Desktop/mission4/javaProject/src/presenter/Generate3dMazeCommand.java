@@ -24,6 +24,7 @@ public class Generate3dMazeCommand extends AbsCommonCommand {
 		     model.generate3dmaze(name, floors, rows, columns);
 		} catch(NumberFormatException e) {
 			e.printStackTrace();
+			view.displayString("Illegal Input - Some filds must be Natural Numbers Bigger than 0");
 		}
 	}
 }
