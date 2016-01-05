@@ -2,7 +2,23 @@ package model;
 
 import java.io.IOException;
 
+import algorithms.mazeGenerators.Position;
+
 public interface Model {
+	
+	/**
+	 * The function set the satrt position for the maze in DB
+	 * @param name The name of the maze 
+	 * @param pos The current position to update {@link Position}
+	 */
+	public void updateStatrPosition(String name, Position pos);
+	/**
+	 * The function calculate the optional moves from specific position
+	 * @param name
+	 * @param pos the current
+	 * @param wantedMove The movement requestd to do
+	 */
+ 	public void getPossibleMovesFromPosition(String name, Position pos, String wantedMove);
 	/**
 	 * The function add to arrayList all files names and directories names
 	 * that in a given File.

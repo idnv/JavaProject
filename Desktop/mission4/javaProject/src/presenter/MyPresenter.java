@@ -28,6 +28,8 @@ public class MyPresenter implements Presenter {
 		commands.put("file size", new FileSizeCommand(view, model));
 		commands.put("solve", new SolveCommand(view, model));
 		commands.put("display solution", new DisplaySolutionCommand(view, model));
+		commands.put("move charachter", new CharacterMovementCommand(model, view));
+		commands.put("update start position", new UpdateStartPositionCommand(model, view));
 	}
 	@SuppressWarnings("unchecked")
 	@Override
@@ -41,7 +43,7 @@ public class MyPresenter implements Presenter {
 					((ArrayList<String>) arg).toArray(arrArgs);
 					command.doCommand(arrArgs);
 				} catch (Exception e) {
-					view.displayString(e.getMessage());
+					e.printStackTrace();
 				}
 			}
 		}

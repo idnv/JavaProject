@@ -58,7 +58,9 @@ public class MyModel extends Observable implements Model {
 					setChanged();
 					notifyObservers("the maze " + mazeName + " has created");
 				}
-				});
+			});
+			int a = 3;
+			System.out.println(a);;
 	}
 
 	@Override
@@ -199,5 +201,28 @@ public class MyModel extends Observable implements Model {
 		
 		setChanged();
 		notifyObservers(this.solutionsHashMap.get(solutionName).getSolutionList());
+	}
+
+
+	@Override
+	public void getPossibleMovesFromPosition(String name, Position pos, String wantedMove) {
+		Maze3d maze = mazeHashMap.get(name);
+		String [] possibleMoves = maze.getPossibleMoves(pos);
+		for(String str : possibleMoves){
+			if (str.equals(wantedMove)) {
+				setChanged();
+				notifyObservers("the movement " + wantedMove + " is allowd");
+				return;
+			}
+		}
+		// not allowd to do the movement
+		return;
+	}
+
+	@Override
+	public void updateStatrPosition(String name, Position pos) {
+		mazeHashMap.get(name).setStartPosition(pos);
+		setChanged();
+		notifyObservers("finish update start position for maze " + name);
 	}
 }

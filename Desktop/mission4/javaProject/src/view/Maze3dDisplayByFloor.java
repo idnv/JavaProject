@@ -137,5 +137,17 @@ public class Maze3dDisplayByFloor extends MazeDisplayer {
 		characterY=row;
 		moveCharacter(col,row);
 	}
+	
+	@Override
+	public int getX() {
+		return this.characterX;
+	}
+
+
+	@Override
+	public int getY() {
+		return this.characterY;
+	}
+
 
 }

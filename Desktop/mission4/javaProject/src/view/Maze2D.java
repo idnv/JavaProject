@@ -8,6 +8,10 @@ import org.eclipse.swt.widgets.Composite;
 
 public class Maze2D extends MazeDisplayer{
 
+	public int characterX=0;
+	public int characterY=2;
+	public int exitX=0;
+	public int exitY=2;
 
 	 public Maze2D(Composite parent,int style){
 	        super(parent, style);
@@ -66,6 +70,18 @@ public class Maze2D extends MazeDisplayer{
 	public void moveRight() {
 		// TODO Auto-generated method stub
 		
+	}
+
+
+	@Override
+	public int getX() {
+		return this.characterX;
+	}
+
+
+	@Override
+	public int getY() {
+		return this.characterY;
 	}
 
 }

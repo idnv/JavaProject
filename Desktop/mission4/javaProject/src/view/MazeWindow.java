@@ -8,6 +8,8 @@ import java.util.TimerTask;
 
 import org.eclipse.swt.SWT;
 import org.eclipse.swt.events.DisposeListener;
+import org.eclipse.swt.events.KeyEvent;
+import org.eclipse.swt.events.KeyListener;
 import org.eclipse.swt.events.SelectionEvent;
 import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
@@ -34,6 +36,8 @@ public class MazeWindow extends BasicWindow {
 	String loadFunctionNewMazeName;
 	String numOfRows,numOfColumns,numOfFloors;
 	MazeDisplayer mazeDisplayer;
+	Position charchterPosition;
+	Button generateNewMazeButton;
 	
 	/**
 	 * generateMazeListener set what to do when the user requests to generate new maze in a file (click the generate maze button)
@@ -59,11 +63,18 @@ public class MazeWindow extends BasicWindow {
 	 * exitListener set what to do when the user requests to exit the program (click the solve button)
 	 */
 	DisposeListener exitListener;
+	/**
+	 * keyPressedListener set what to do when the user press a key from keyboard
+	 */
+	KeyListener keyListener;
+	
 	
 	MenuItem mazeGetSoulutionItem, mazeGetHintItem;
 	
 	public MazeWindow(String title, int width, int height) {
 		super(title, width, height);
+		
+		
 	}
 
 	//Menu menuBar, fileMenu, helpMenu;
@@ -135,14 +146,14 @@ public class MazeWindow extends BasicWindow {
 		shell.setMenuBar(menuBar);
 		// ---------------------- generateNewMazeButton -------------------------------//
 		
-		Button generateNewMazeButton=new Button(shell, SWT.PUSH);
+		generateNewMazeButton=new Button(shell, SWT.PUSH);
 		generateNewMazeButton.setText("Generate New Maze");
 		generateNewMazeButton.setLayoutData(new GridData(SWT.FILL, SWT.None, false, false, 1, 1));
 		generateNewMazeButton.addSelectionListener(new SelectionListener() {
 			
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
-			//	Properties p = new Properties();
+				generateNewMazeButton.setEnabled(false);
 				MazeProperties mazePropertiesWin= new MazeProperties("maze example",500,500, shell);
 				mazePropertiesWin.run();
 			
@@ -151,16 +162,13 @@ public class MazeWindow extends BasicWindow {
 				setNumOfRows(mazePropertiesWin.getNumOfRows());
 				setNumOfColumns(mazePropertiesWin.getNumOfColumns());
 				
-				System.out.println("ROWS" + numOfRows);
-				System.out.println("Col" + numOfColumns);;
-				System.out.println("F" + numOfFloors);;
 				generateMazeListener.widgetSelected(arg0);
 			
 			}
 			
 			@Override
 			public void widgetDefaultSelected(SelectionEvent arg0) {
-				// TODO Auto-generated method stub
+				
 				
 			}
 		});	
@@ -169,6 +177,43 @@ public class MazeWindow extends BasicWindow {
 		//MazeDisplayer maze=new Maze2D(shell, SWT.BORDER);		
 		mazeDisplayer=new Maze3dDisplayByFloor(shell, SWT.BORDER);
 		mazeDisplayer.setLayoutData(new GridData(SWT.FILL, SWT.FILL, true,true,1,1));
+	
+		// ----------------------------- Maze displayer key relesed ---------------------- //
+		mazeDisplayer.addKeyListener(new KeyListener() {
+			
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				
+				keyListener.keyReleased(arg0);
+			}
+			
+			@Override
+			public void keyPressed(KeyEvent arg0) {
+				
+				if(arg0.keyCode == SWT.ARROW_LEFT){
+					mazeDisplayer.moveLeft();
+					charchterPosition.setRow(mazeDisplayer.getX());
+					charchterPosition.setColumn(mazeDisplayer.getY());
+				}
+				if(arg0.keyCode == SWT.ARROW_RIGHT){
+					mazeDisplayer.moveRight();
+					charchterPosition.setRow(mazeDisplayer.getX());
+					charchterPosition.setColumn(mazeDisplayer.getY());
+				}
+				if(arg0.keyCode == SWT.ARROW_DOWN){
+					mazeDisplayer.moveDown();
+					charchterPosition.setRow(mazeDisplayer.getX());
+					charchterPosition.setColumn(mazeDisplayer.getY());
+				}
+					
+				if(arg0.keyCode == SWT.ARROW_UP){
+					charchterPosition.setRow(mazeDisplayer.getX());
+					charchterPosition.setColumn(mazeDisplayer.getY());
+					mazeDisplayer.moveUp();
+				}
+					
+			}
+		});
 		
 	}
 
@@ -177,21 +222,22 @@ public class MazeWindow extends BasicWindow {
 	}
 	public void newGeneratedMaze(int[][] crossedMaze){
 		this.currentCrossedMaze = crossedMaze;
+		
+		mazeDisplayer.setCharacterPosition(charchterPosition.getRow(), charchterPosition.getColumn());
+		mazeDisplayer.setMazeData(currentCrossedMaze);
+		//mazeDisplayer.redraw();
+	
+		
+	
 		display.syncExec(new Runnable() {
 			
 			@Override
 			public void run() {
-				if(mazeDisplayer == null)
-					mazeDisplayer = new Maze3dDisplayByFloor(shell,SWT.BORDER);
-				else{
-					mazeDisplayer.setMazeData(currentCrossedMaze);
-					mazeDisplayer.redraw();
-				}
+				generateNewMazeButton.setEnabled(true);
 				mazeGetSoulutionItem.setEnabled(true);
 				mazeGetHintItem.setEnabled(true);
-			}
+			}			
 		});
-		
 	}
 
 	private void refreshPositions(ArrayList<State<Position>> arr){
@@ -204,6 +250,16 @@ public class MazeWindow extends BasicWindow {
 				e.printStackTrace();
 			}
 	}
+	
+	
+	
+	/**
+	 * @param keyPressedListener the keyPressedListener to set
+	 */
+	public void setKeyPressedListener(KeyListener keyPressedListener) {
+		this.keyListener = keyPressedListener;
+	}
+
 	/**
 	 * @param generateMazeListener the generateMazeListener to set
 	 */
@@ -211,12 +267,6 @@ public class MazeWindow extends BasicWindow {
 		this.generateMazeListener = generateMazeListener;
 	}
 
-	/**
-	 * @return the clueListener
-	 */
-	public SelectionListener getClueListener() {
-		return clueListener;
-	}
 
 	/**
 	 * @param clueListener the clueListener to set
@@ -226,26 +276,12 @@ public class MazeWindow extends BasicWindow {
 	}
 
 	/**
-	 * @return the solveListener
-	 */
-	public SelectionListener getSolveListener() {
-		return solveListener;
-	}
-
-	/**
 	 * @param solveListener the solveListener to set
 	 */
 	public void setSolveListener(SelectionListener solveListener) {
 		this.solveListener = solveListener;
 	}
-
-	/**
-	 * @return the saveMazeListener
-	 */
-	public SelectionListener getSaveMazeListener() {
-		return saveMazeListener;
-	}
-
+	
 	/**
 	 * @param saveMazeListener the saveMazeListener to set
 	 */
@@ -254,24 +290,10 @@ public class MazeWindow extends BasicWindow {
 	}
 
 	/**
-	 * @return the loadMazeListener
-	 */
-	public SelectionListener getLoadMazeListener() {
-		return loadMazeListener;
-	}
-
-	/**
 	 * @param loadMazeListener the loadMazeListener to set
 	 */
 	public void setLoadMazeListener(SelectionListener loadMazeListener) {
 		this.loadMazeListener = loadMazeListener;
-	}
-
-	/**
-	 * @return the exitListener
-	 */
-	public DisposeListener getExitListener() {
-		return exitListener;
 	}
 
 	/**
@@ -381,6 +403,19 @@ public class MazeWindow extends BasicWindow {
 		this.numOfFloors = numOfFloors;
 	}
 
-	
+	/**
+	 * @return the charchterPosition
+	 */
+	public Position getCharchterPosition() {
+		return charchterPosition;
+	}
+
+	/**
+	 * @param charchterPosition the charchterPosition to set
+	 */
+	public void setCharchterPosition(Position charchterPosition) {
+		this.charchterPosition = charchterPosition;
+	}
+
 	
 }
