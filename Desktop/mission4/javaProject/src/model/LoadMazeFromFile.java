@@ -23,17 +23,20 @@ public class LoadMazeFromFile {
 	 */
 	public static Maze3d loadMazeFromFile(String newMazeName, String fileName) throws IOException, NullPointerException{
 		
-		File f = new File(fileName + ".txt");
+		//File f = new File(fileName + ".txt");
+		File f = new File(fileName );
 		if(!f.exists())
 			throw new NullPointerException("Error! the maze file " + fileName + " not found");
 		// Calculate size of decompressed array
-		InputStream inStream = new MyDecompressorInputStream(new FileInputStream(fileName + ".txt"));
+	//	InputStream inStream = new MyDecompressorInputStream(new FileInputStream(fileName + ".txt"));
+		InputStream inStream = new MyDecompressorInputStream(new FileInputStream(fileName));
 		byte [] arr = new byte[20];
 		inStream.read(arr);
 		inStream.close();
 		int size = (((int)arr[6] * (int)arr[7] * (int)arr[8]) + 9);
 		//Load maze					
-		InputStream in=new MyDecompressorInputStream(new FileInputStream(fileName + ".txt"));
+	//	InputStream in=new MyDecompressorInputStream(new FileInputStream(fileName + ".txt"));
+		InputStream in=new MyDecompressorInputStream(new FileInputStream(fileName));
 		byte decompressedMazeByteArr[]= new byte[size];
 		in.read(decompressedMazeByteArr);
 		in.close();

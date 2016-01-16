@@ -9,24 +9,8 @@ import org.eclipse.swt.widgets.Composite;
 // (2) other programmers can use it naturally
 public abstract class MazeDisplayer extends Canvas{
 	
-	//TODO Replce stub
-	// just as a stub...
-	
 	int[][] mazeData = { {0,0} , {0,0} };
-	/*={
-			{1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-			{1,0,0,0,0,0,0,0,1,1,0,1,0,0,1},
-			{0,0,1,1,1,1,1,0,0,1,0,1,0,1,1},
-			{1,1,1,0,0,0,1,0,1,1,0,1,0,0,1},
-			{1,0,1,0,1,1,1,0,0,0,0,1,1,0,1},
-			{1,1,0,0,0,1,0,0,1,1,1,1,0,0,1},
-			{1,0,0,1,0,0,1,0,0,0,0,1,0,1,1},
-			{1,0,1,1,0,1,1,0,1,1,0,0,0,1,1},
-			{1,0,0,0,0,0,0,0,0,1,0,1,0,0,1},
-			{1,1,1,1,1,1,1,1,1,1,1,1,0,1,1},
-		};
-
-	*/
+	
 	public MazeDisplayer(Composite parent, int style) {
 		super(parent, style);
 	}
@@ -42,7 +26,10 @@ public abstract class MazeDisplayer extends Canvas{
 		});
 	}
 	
-	public abstract  void setCharacterPosition(int row,int col);
+	
+	public abstract void setGoalPosition(int row,int col);
+	
+	public abstract void setCharacterPosition(int row,int col);
 
 	public abstract void moveUp();
 
@@ -52,9 +39,9 @@ public abstract class MazeDisplayer extends Canvas{
 
 	public  abstract void moveRight();
 	
-	public abstract int getX();
+	public abstract int getColumn();
 	
-	public abstract int getY();
+	public abstract int getRow();
 	
 	
 	

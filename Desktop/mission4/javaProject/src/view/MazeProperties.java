@@ -14,9 +14,11 @@ import org.eclipse.swt.widgets.Text;
 public class MazeProperties extends BasicWindow {
 
 	private String mazeName, numOfRows, numOfColumns, numOfFloors;
+	private boolean changeSucceeded;
 	
 	public MazeProperties(String title, int width, int height, Shell parent) {
 		super(title, width, height, parent);
+		this.changeSucceeded = false;
 	}
 	
 	
@@ -66,12 +68,18 @@ public class MazeProperties extends BasicWindow {
 					@Override
 					public void widgetSelected(SelectionEvent arg0) {
 						
-						if(!numberOfFloorsData.getText().equals("") && !numberOfRowsData.getText().equals("") && !numberOfColumnsData.getText().equals("") && !mazeNameData.getText().equals(" ")){
-							numOfColumns =  numberOfColumnsData.getText();
-							numOfFloors = numberOfFloorsData.getText();
-							numOfRows = numberOfRowsData.getText();
-							mazeName = mazeNameData.getText();
-						}
+						if(!numberOfFloorsData.getText().equals(" ") && !numberOfRowsData.getText().equals(" ") && !numberOfColumnsData.getText().equals("") && !mazeNameData.getText().equals(" ")){
+							if(numberOfFloorsData.getText().matches("[0-9]+") &&  numberOfRowsData.getText().matches("[0-9]+") && numberOfColumnsData.getText().matches("[0-9]+")){
+									numOfColumns =  numberOfColumnsData.getText();
+									numOfFloors = numberOfFloorsData.getText();
+									numOfRows = numberOfRowsData.getText();
+									mazeName = mazeNameData.getText();
+									changeSucceeded = true;
+							}
+							else{
+								setEror("Ilegal Fields Input");
+							}
+						}	
 						else{
 							setEror("All fields should be filled");
 						}	
@@ -107,6 +115,15 @@ public class MazeProperties extends BasicWindow {
 	 */
 	public String getNumOfColumns() {
 		return numOfColumns;
+	}
+
+
+	/**
+	 * @return changeSucceeded, true if all input is legal
+	 * false id not
+	 */
+	public boolean isChangeSucceeded() {
+		return changeSucceeded;
 	}
 
 

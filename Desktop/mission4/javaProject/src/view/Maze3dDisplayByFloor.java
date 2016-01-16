@@ -7,8 +7,8 @@ import org.eclipse.swt.widgets.Composite;
 
 public class Maze3dDisplayByFloor extends MazeDisplayer {
 
-	public int characterX=0;
-	public int characterY=2;
+	public int characterColumn=0;
+	public int characterRow=2;
 	public int exitX=0;
 	public int exitY=2;
 	
@@ -62,7 +62,7 @@ public class Maze3dDisplayByFloor extends MazeDisplayer {
 				          if(mazeData[i][j]!=0)
 				        	  paintCube(dpoints, cheight,e);
 				          
-				          if(i==characterY && j==characterX){
+				          if(i==characterRow && j==characterColumn){
 							   e.gc.setBackground(new Color(null,200,0,0));
 							   e.gc.fillOval((int)Math.round(dpoints[0]), (int)Math.round(dpoints[1]-cheight/2), (int)Math.round((w0+w1)/2), (int)Math.round(h));
 							   e.gc.setBackground(new Color(null,255,0,0));
@@ -76,12 +76,12 @@ public class Maze3dDisplayByFloor extends MazeDisplayer {
 		});
 	}
 	
-	private void moveCharacter(int x,int y){
-		if(x>=0 && x<mazeData[0].length && y>=0 && y<mazeData.length && mazeData[y][x]==0){
-			characterX=x;
-			characterY=y;
+	private void moveCharacter(int column ,int row){
+		if(column >=0 && column < mazeData[0].length && row >=0 && row < mazeData.length && mazeData[row][column]== 0){
+			characterColumn = column;
+			characterRow = row;
 			getDisplay().syncExec(new Runnable() {
-				
+	
 				@Override
 				public void run() {
 					redraw();
@@ -95,8 +95,8 @@ public class Maze3dDisplayByFloor extends MazeDisplayer {
 	 */
 	@Override
 	public void moveUp() {
-		int x=characterX;
-		int y=characterY;
+		int x=characterColumn;
+		int y=characterRow;
 		y=y-1;
 		moveCharacter(x, y);
 	}
@@ -105,8 +105,8 @@ public class Maze3dDisplayByFloor extends MazeDisplayer {
 	 */
 	@Override
 	public void moveDown() {
-		int x=characterX;
-		int y=characterY;
+		int x=characterColumn;
+		int y=characterRow;
 		y=y+1;
 		moveCharacter(x, y);
 	}
@@ -115,8 +115,8 @@ public class Maze3dDisplayByFloor extends MazeDisplayer {
 	 */
 	@Override
 	public void moveLeft() {
-		int x=characterX;
-		int y=characterY;
+		int x=characterColumn;
+		int y=characterRow;
 		x=x-1;
 		moveCharacter(x, y);
 	}
@@ -125,28 +125,35 @@ public class Maze3dDisplayByFloor extends MazeDisplayer {
 	 */
 	@Override
 	public void moveRight() {
-		int x=characterX;
-		int y=characterY;
+		int x=characterColumn;
+		int y=characterRow;
 		x=x+1;
 		moveCharacter(x, y);
 	}
 	
 	@Override
 	public void setCharacterPosition(int row, int col) {
-		characterX=col;
-		characterY=row;
+		characterColumn=col;
+		characterRow=row;
+		System.out.println("moveCharacter(" + col + "," + row + ")");
 		moveCharacter(col,row);
 	}
 	
 	@Override
-	public int getX() {
-		return this.characterX;
+	public int getColumn() {
+		return this.characterColumn;
 	}
 
 
 	@Override
-	public int getY() {
-		return this.characterY;
+	public int getRow() {
+		return this.characterRow;
+	}
+	
+	@Override
+	public void setGoalPosition(int row, int col) {
+		this.exitX = col;
+		this.exitY = row;
 	}
 
 

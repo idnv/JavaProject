@@ -3,22 +3,36 @@ package model;
 import java.io.IOException;
 
 import algorithms.mazeGenerators.Position;
+import presenter.Properties;
 
 public interface Model {
 	
+	/**
+	 * The function save the properties class in a file.
+	 * The function also update the new data in her relevant variables
+	 * @param properties The properties class {@link Properties}
+	 * @throws Exception
+	 */
+	public void saveAndUpdateProperties(Properties properties) throws Exception;
+	/**
+	 * The function get the satrt position for the maze in DB
+	 * @param name The name of the maze 
+	 * @param pos The current position to update {@link Position}
+	 */
+	public void getStatrPosition(String name) throws Exception;
 	/**
 	 * The function set the satrt position for the maze in DB
 	 * @param name The name of the maze 
 	 * @param pos The current position to update {@link Position}
 	 */
-	public void updateStatrPosition(String name, Position pos);
+	public void updateStatrPosition(String name, Position pos) throws Exception;
 	/**
 	 * The function calculate the optional moves from specific position
 	 * @param name
 	 * @param pos the current
 	 * @param wantedMove The movement requestd to do
 	 */
- 	public void getPossibleMovesFromPosition(String name, Position pos, String wantedMove);
+ 	public void getPossibleMovesFromPosition(String name, Position pos, String wantedMove) throws Exception;
 	/**
 	 * The function add to arrayList all files names and directories names
 	 * that in a given File.
@@ -81,4 +95,17 @@ public interface Model {
 	 * @param solutionName the name of solution {@link Solution}
 	 */
 	public void displaySolution(String solutionName) throws Exception;
+	/**
+	 * The function calculates the cross section by floor with information about
+	 * every cell in maze. the function pass the ready cross section to presenter by notify
+	 * 0 - pass
+	 *  1- wall 
+	 *  2- pass + can move down
+	 *  3 - pass + can move up
+	 *  4 - pass +  can move down + can move up
+	 *  5- goal position
+	 * @param name name of maze {@link Maze3d}
+	 * @param index index of cross {@link Integer}
+	 */
+	public void getCrossByFloorWithInformation(String name, int index) throws IndexOutOfBoundsException, Exception;
 }

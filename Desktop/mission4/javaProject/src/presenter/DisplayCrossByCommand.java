@@ -22,6 +22,5 @@ public class DisplayCrossByCommand extends AbsCommonCommand {
 		} catch(NumberFormatException e) {
 			e.printStackTrace();
 		}
-		
 	}
 }

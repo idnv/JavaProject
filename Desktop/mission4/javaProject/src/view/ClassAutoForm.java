@@ -25,10 +25,12 @@ import presenter.Properties;
 
 public class ClassAutoForm extends BasicWindow{
 
-	Object theNewClass;
+	Object newCreatedClass;
 	@SuppressWarnings("rawtypes")
 	Class classToShow;
+	boolean isSuccessfullyCreated = false;
 	
+	@SuppressWarnings("rawtypes")
 	public ClassAutoForm(String title, Class classToShow, Shell parent) {
 		super(title, 300, 200, parent);
 		this.classToShow = classToShow;
@@ -111,12 +113,20 @@ public class ClassAutoForm extends BasicWindow{
 		
 			
 	}
-		
+	
+	
 	/**
-	 * @return the theNewClass
+	 * @return isSuccessfullyCreated - if the create succeeded
 	 */
-	public Object getTheNewClass() {
-		return theNewClass;
+	public boolean isSuccessfullyCreated() {
+		return isSuccessfullyCreated;
+	}
+
+	/**
+	 * @return the new object that created
+	 */
+	public Object getNewCreatedClass() {
+		return newCreatedClass;
 	}
 	
 	

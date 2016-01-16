@@ -1,6 +1,10 @@
 package model;
 
+import java.beans.XMLEncoder;
+import java.io.BufferedOutputStream;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -27,13 +31,14 @@ public class MyModel extends Observable implements Model {
 	private HashMap<String, Solution<Position>> solutionsHashMap;
 	private HashMap<Maze3d, Solution<Position>> cach;
 	private ExecutorService threadPool;
-	Properties propertiesFromXMLFile;
+	private String defaultSolveAlgorithm;
+	
 	public MyModel(Properties properties) {
 		this.cach = new HashMap<Maze3d, Solution<Position>>();
 		this.mazeHashMap = new HashMap<String, Maze3d>();
 		this.solutionsHashMap = new HashMap<String, Solution<Position>>();
-		this.propertiesFromXMLFile = properties;
 		this.threadPool = Executors.newFixedThreadPool(properties.getNumOfThreadsInThreadPool());
+		this.defaultSolveAlgorithm = properties.getDefaultSolver();
 	}
 	
 	@Override
@@ -75,7 +80,6 @@ public class MyModel extends Observable implements Model {
 
 	@Override
 	public void getCrossBy(String name, int index, String dimension)  throws  IndexOutOfBoundsException, Exception {
-		//TODO change get cross to throw IndexOutOfBoundsException with information
 		if(!mazeHashMap.containsKey(name))
 			throw new Exception("Error! the maze " + name + " not found");
 		
@@ -122,7 +126,7 @@ public class MyModel extends Observable implements Model {
 		// update hashmap
 		mazeHashMap.put(mazeName, loadedMaze);
 		setChanged();
-		notifyObservers("the file " + fileName + " has been loaded and his name is " + mazeName );
+		notifyObservers("the maze " + mazeName + " has been loaded from file " + fileName );
 	}
 	
 	@Override
@@ -151,9 +155,9 @@ public class MyModel extends Observable implements Model {
 	}
 
 	@Override
-	public void solve(String mazeName, String algorithm) throws Exception {
+	public void solve(String mazeName, String algorithm) throws NullPointerException {
 		if(!mazeHashMap.containsKey(mazeName))
-			throw new Exception("Error! the maze " + mazeName + " not found");
+			throw new NullPointerException("Error! the maze " + mazeName + " not found");
 		
 			if(this.solutionsHashMap.containsKey(mazeName)){
 				setChanged();
@@ -164,7 +168,7 @@ public class MyModel extends Observable implements Model {
 			Searcher<Position> s;
 			
 			if(!algorithm.equals("BFS") && !algorithm.equals("mazeAirDistance") && !algorithm.equals("mazeManhattanDistance"))
-				 algorithm = this.propertiesFromXMLFile.getDefaultSolver();
+				 algorithm = this.defaultSolveAlgorithm;
 			
 			switch (algorithm) {
 			case "BFS":
@@ -177,20 +181,20 @@ public class MyModel extends Observable implements Model {
 				s = new Astar<Position>(new MazeManhattanDistance(maze.getGoalPosition()));
 				break;
 			default:
-				throw new Exception("There algorithm such " + algorithm + " noe found");
+				throw new NullPointerException("There algorithm such " + algorithm + " noe found");
 			}
 				// run solve algorithm in thread
-				new Thread(new Runnable() {
+			threadPool.execute(new Runnable() {
 					@Override
 					public void run() {
 						
 						Solution<Position> sol = s.search(new MazeAdapter(maze));
 						cach.put(mazeHashMap.get(mazeName), sol);
 						solutionsHashMap.put(mazeName, sol);
-						clearChanged();
+						setChanged();
 						notifyObservers("solution for " + mazeName +" is ready");
 					}
-				}).start();
+				});
 	}
 	
 	@Override
@@ -205,7 +209,9 @@ public class MyModel extends Observable implements Model {
 
 
 	@Override
-	public void getPossibleMovesFromPosition(String name, Position pos, String wantedMove) {
+	public void getPossibleMovesFromPosition(String name, Position pos, String wantedMove) throws NullPointerException {
+		if(!mazeHashMap.containsKey(name))
+			throw new NullPointerException("Error! the maze " + name + " not found");
 		Maze3d maze = mazeHashMap.get(name);
 		String [] possibleMoves = maze.getPossibleMoves(pos);
 		for(String str : possibleMoves){
@@ -220,9 +226,47 @@ public class MyModel extends Observable implements Model {
 	}
 
 	@Override
-	public void updateStatrPosition(String name, Position pos) {
+	public void updateStatrPosition(String name, Position pos) throws Exception {
+		if(!mazeHashMap.containsKey(name))
+			throw new Exception("Error! the maze " + name + " not found");
 		mazeHashMap.get(name).setStartPosition(pos);
 		setChanged();
 		notifyObservers("finish update start position for maze " + name);
+	}
+
+	@Override
+	public void getStatrPosition(String name) throws NullPointerException{
+		if(!mazeHashMap.containsKey(name))
+			throw new NullPointerException("Error! the maze " + name + " not found");
+		setChanged();
+		notifyObservers("the start poistion for maze " + name + " is " + mazeHashMap.get(name).getStartPosition());
+		
+	}
+
+	@Override
+	public void saveAndUpdateProperties(Properties properties) throws Exception {
+		XMLEncoder coder = null;
+		
+		try {
+			coder = new XMLEncoder(new BufferedOutputStream(new FileOutputStream("Properties.xml")));
+			coder.writeObject(properties);
+			this.defaultSolveAlgorithm = properties.getDefaultSolver();
+		} catch (FileNotFoundException e) {
+			setChanged();
+			notifyObservers("Can't Save Properties File");
+		}
+		finally {
+			coder.close();
+		}
+	}
+
+	@Override
+	public void getCrossByFloorWithInformation(String name, int index) throws IndexOutOfBoundsException, Exception {
+		if(!mazeHashMap.containsKey(name))
+			throw new Exception("Error! the maze " + name + " not found");
+		
+		int [][]floorCrossSectionWithInfo = mazeHashMap.get(name).floorCrossSectionInfo(index);
+		setChanged();
+		notifyObservers(floorCrossSectionWithInfo);
 	}
 }

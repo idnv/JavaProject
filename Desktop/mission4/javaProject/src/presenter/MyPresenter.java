@@ -30,6 +30,8 @@ public class MyPresenter implements Presenter {
 		commands.put("display solution", new DisplaySolutionCommand(view, model));
 		commands.put("move charachter", new CharacterMovementCommand(model, view));
 		commands.put("update start position", new UpdateStartPositionCommand(model, view));
+		commands.put("get start position", new GetStartPositionCommand(model, view));
+		commands.put("get floor information", new GetCrossSectionByFloorWithInformation(model, view));
 	}
 	@SuppressWarnings("unchecked")
 	@Override
@@ -45,6 +47,9 @@ public class MyPresenter implements Presenter {
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
+			}
+			if(arg instanceof Properties){
+				//TODO complete
 			}
 		}
 		if(o == model){
