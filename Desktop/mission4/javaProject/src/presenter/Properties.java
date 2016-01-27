@@ -7,12 +7,16 @@ public class Properties implements Serializable {
 
 	private int numOfThreadsInThreadPool;
 	private String defaultSolver;
-	private String view;
+	private String UI;
+	private String IPOfServer;
+	private int portServerIsListening;
 	
 	public Properties() {
 		this.numOfThreadsInThreadPool = 4;
 		this.defaultSolver = "mazeManhattanDistance";
-		this.view = "CLI";
+		this.UI = "CLI";
+		this.IPOfServer = "127.0.0.1";
+		this.portServerIsListening = 3750;
 	}
 
 	/**
@@ -44,17 +48,45 @@ public class Properties implements Serializable {
 	}
 
 	/**
-	 * @return the view
+	 * @return the uI
 	 */
-	public String getView() {
-		return view;
+	public String getUI() {
+		return UI;
 	}
 
 	/**
-	 * @param view the view to set
+	 * @param uI the uI to set
 	 */
-	public void setView(String view) {
-		this.view = view;
+	public void setUI(String uI) {
+		UI = uI;
+	}
+
+	/**
+	 * @return the iPOfServer
+	 */
+	public String getIPOfServer() {
+		return IPOfServer;
+	}
+
+	/**
+	 * @param iPOfServer the iPOfServer to set
+	 */
+	public void setIPOfServer(String iPOfServer) {
+		IPOfServer = iPOfServer;
+	}
+
+	/**
+	 * @return the portServerIsListening
+	 */
+	public int getPortServerIsListening() {
+		return portServerIsListening;
+	}
+
+	/**
+	 * @param portServerIsListening the portServerIsListening to set
+	 */
+	public void setPortServerIsListening(int portServerIsListening) {
+		this.portServerIsListening = portServerIsListening;
 	}
 	
 	

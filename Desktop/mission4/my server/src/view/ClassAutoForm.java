@@ -15,7 +15,7 @@ import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
 import org.eclipse.swt.widgets.Text;
 
-import presenter.Properties;
+
 
 public class ClassAutoForm extends BasicWindow{
 
@@ -26,8 +26,8 @@ public class ClassAutoForm extends BasicWindow{
 	boolean isSuccessfullyCreated = false;
 	
 	@SuppressWarnings("rawtypes")
-	public ClassAutoForm(String title, Class classToShow, Shell parent) {
-		super(title, 300, 200, parent);
+	public ClassAutoForm(String title, Class classToShow, Shell parent,int width, int height) {
+		super(title, width, height, parent);
 		this.classToShow = classToShow;
 	}
 	

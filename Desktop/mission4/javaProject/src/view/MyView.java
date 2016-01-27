@@ -103,5 +103,11 @@ public class MyView extends Observable implements View, Observer {
 		}
 	}
 
+	@Override
+	public void displayEror(String eror) {
+		out.println(eror);
+		out.flush();
+	}
+
 	
 }

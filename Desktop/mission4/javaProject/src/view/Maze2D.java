@@ -17,7 +17,9 @@ public class Maze2D extends MazeDisplayer{
 	public int exitColumnIndex = -1;
 	public int exitRowIndex = -1;
 	private boolean isGoalFloor = false;
+	private boolean isWon = false;
 	
+
 	public AbsCharacter player;
 	public Image walls;
 	public Image floorDownPassage;
@@ -25,38 +27,7 @@ public class Maze2D extends MazeDisplayer{
 	public Image upAndDownPassage;
 	public Image goal;
 	public Image winScreen;
-	
-	/*
-	 public Maze2D(Composite parent,int style){
-	        super(parent, style);
-	    	// set a white background   (red, green, blue)
-	    	setBackground(new Color(null, 255, 255, 255));
-	    	addPaintListener(new PaintListener() {
-				
-				@Override
-				public void paintControl(PaintEvent e) {
-					   e.gc.setForeground(new Color(null,0,0,0));
-					   e.gc.setBackground(new Color(null,0,0,0));
-
-					   int width=getSize().x;
-					   int height=getSize().y;
-
-					   int w=width/mazeData[0].length;
-					   int h=height/mazeData.length;
-
-					   for(int i=0;i<mazeData.length;i++)
-					      for(int j=0;j<mazeData[i].length;j++){
-					          int x=j*w;
-					          int y=i*h;
-					          if(mazeData[i][j]!=0)
-					              e.gc.fillRectangle(x,y,w,h);
-					      }
-					}
-			});
-	 }
-*/
-	
-	 
+		 
 	 public Maze2D(Composite parent,int style, AbsCharacter player){
 	        super(parent, style);
 	    	
@@ -109,15 +80,18 @@ public class Maze2D extends MazeDisplayer{
 					          if(i == characterRowIndex && j == characterColumnIndex)
 					        	  //player.draw(e, x, y, width, height);
 					        	  e.gc.drawImage(player.charachterPicture, 0, 0, player.charachterPicture.getBounds().width,  player.charachterPicture.getBounds().height, x, y, w, h);
-					          if(exitColumnIndex == characterColumnIndex && exitRowIndex == characterRowIndex && isGoalFloor)  
+					          if((exitColumnIndex == characterColumnIndex && exitRowIndex == characterRowIndex && isGoalFloor)) { 
+					        	  // player won
+					        	  isWon = true;
 								  e.gc.drawImage(winScreen, 0, 0, winScreen.getBounds().width, winScreen.getBounds().height, 0, 0, width, height);
+					          }
 					      }
 					   
 					}
 			});
 	 }
 	 private void moveCharacter(int x,int y){
-			if(x>=0 && x<mazeData[0].length && y>=0 && y<mazeData.length && mazeData[y][x] != 1){
+			if(x>=0 && x<mazeData[0].length && y>=0 && y<mazeData.length && mazeData[y][x] != 1 && !this.isWon){
 				characterColumnIndex=x;
 				characterRowIndex=y;
 				getDisplay().syncExec(new Runnable() {
@@ -196,6 +170,20 @@ public class Maze2D extends MazeDisplayer{
 		this.exitColumnIndex = col;
 		this.exitRowIndex = row;
 		
+	}
+	
+
+	/**
+	 * @return the isWon
+	 */
+	public boolean isWon() {
+		return isWon;
+	}
+	/**
+	 * @param isWon the isWon to set
+	 */
+	public void setWon(boolean isWon) {
+		this.isWon = isWon;
 	}
 
 }

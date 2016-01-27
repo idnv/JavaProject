@@ -155,6 +155,16 @@ public class Maze3dDisplayByFloor extends MazeDisplayer {
 		this.exitX = col;
 		this.exitY = row;
 	}
+	@Override
+	public void setWon(boolean isWon) {
+		// TODO Auto-generated method stub
+		
+	}
+	@Override
+	public boolean isWon() {
+		// TODO Auto-generated method stub
+		return false;
+	}
 
 
 }

@@ -6,6 +6,7 @@ import org.eclipse.swt.events.SelectionListener;
 import org.eclipse.swt.layout.GridData;
 import org.eclipse.swt.layout.GridLayout;
 import org.eclipse.swt.widgets.Button;
+import org.eclipse.swt.widgets.Display;
 import org.eclipse.swt.widgets.Label;
 import org.eclipse.swt.widgets.MessageBox;
 import org.eclipse.swt.widgets.Shell;
@@ -134,7 +135,7 @@ public class MazeProperties extends BasicWindow {
 		return numOfFloors;
 	}
 	private void setEror(String eror){
-		display.getCurrent().syncExec(new Runnable() {
+		Display.getCurrent().syncExec(new Runnable() {
 			
 			@Override
 			public void run() {

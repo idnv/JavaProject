@@ -38,7 +38,7 @@ public class Run {
 		}
 		
 		
-		if(properties.getView().equals("CLI")){
+		if(properties.getUI().equals("CLI")){
 			Model model = new MyModel(properties);
 			CLI cli = new CLI(new BufferedReader(new InputStreamReader(System.in)), new PrintWriter(System.out));
 			View view = new MyView(cli,new BufferedReader(new InputStreamReader(System.in)), new PrintWriter(System.out));
@@ -48,7 +48,7 @@ public class Run {
 			((Observable)cli).addObserver((Observer)view);;
 			view.start();
 		}
-		if(properties.getView().equals("GUI")){
+		if(properties.getUI().equals("GUI")){
 			Model model = new MyModel(properties);
 			View view = new MainWindow("My Game", 500, 500);
 			Presenter presenter = new MyPresenter(model, view);

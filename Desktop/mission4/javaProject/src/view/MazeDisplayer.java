@@ -1,5 +1,9 @@
 package view;
 
+import org.eclipse.swt.SWT;
+import org.eclipse.swt.events.MouseEvent;
+import org.eclipse.swt.events.MouseWheelListener;
+import org.eclipse.swt.graphics.Point;
 import org.eclipse.swt.widgets.Canvas;
 import org.eclipse.swt.widgets.Composite;
 
@@ -13,6 +17,34 @@ public abstract class MazeDisplayer extends Canvas{
 	
 	public MazeDisplayer(Composite parent, int style) {
 		super(parent, style);
+		
+	addMouseWheelListener(new MouseWheelListener() {
+				
+				@Override
+				public void mouseScrolled(MouseEvent arg0) {
+					if((arg0.stateMask & SWT.CONTROL) == SWT.CONTROL)
+					{
+						if(arg0.count > 0){
+	                        int width = getSize().x;
+	                        int height = getSize().y;
+	
+	                        setSize((int)(width * 1.05), (int)(height * 1.05));
+	
+	
+	                    }
+	                    else {
+	
+	                        int width = getSize().x;
+	                        int height = getSize().y;
+	
+	                        setSize((int)(width * 0.95), (int)(height * 0.95));
+	
+	                        }
+					}
+					
+				}
+				
+			});
 	}
 
 	public void setMazeData(int[][] mazeData){
@@ -26,6 +58,10 @@ public abstract class MazeDisplayer extends Canvas{
 		});
 	}
 	
+	
+	public abstract  boolean isWon();
+	
+	public abstract  void setWon(boolean isWon);
 	
 	public abstract void setGoalPosition(int row,int col);
 	

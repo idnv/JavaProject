@@ -36,10 +36,10 @@ public class MainWindow extends Observable implements View {
 			
 			@Override
 			public void widgetDisposed(DisposeEvent arg0) {
-				//setChanged();
-				//ArrayList<String> args = new ArrayList<String>();
-				//args.add("exit");
-			//	notifyObservers(args);
+				setChanged();
+				ArrayList<String> args = new ArrayList<String>();
+				args.add("exit");
+				notifyObservers(args);
 			}
 		});
 		
@@ -91,7 +91,20 @@ public class MainWindow extends Observable implements View {
 			
 			@Override
 			public void widgetSelected(SelectionEvent arg0) {
+				
+				SaveMazeWindow saveWin = new SaveMazeWindow("Save Maze In File", width, height, mazeWindow.getShell());
+				saveWin.run();
+				if(saveWin.isChangeSucceeded()){
+					String filePath = saveWin.getMazePath();
+					String newMazeName = mazeWindow.getMazeName();
 					
+					ArrayList<String> args = new ArrayList<String>();
+					args.add("save maze");
+					args.add(newMazeName);
+					args.add(filePath);
+					setChanged();
+					notifyObservers(args);
+				}
 			}
 			
 			@Override
@@ -109,15 +122,17 @@ public class MainWindow extends Observable implements View {
 				
 				LoadPropertiesWindow loadWin = new LoadPropertiesWindow("Maze Load", width, height, mazeWindow.getShell());
 				loadWin.run();
-				String filePath = loadWin.getMazePath();
-				String newMazeName = loadWin.getMazeNewName();
-				
-				ArrayList<String> args = new ArrayList<String>();
-				args.add("load maze");
-				args.add(filePath);
-				args.add(newMazeName);
-				setChanged();
-				notifyObservers(args);
+				if(loadWin.isChangeSucceeded()){
+					String filePath = loadWin.getMazePath();
+					String newMazeName = loadWin.getMazeNewName();
+					
+					ArrayList<String> args = new ArrayList<String>();
+					args.add("load maze");
+					args.add(filePath);
+					args.add(newMazeName);
+					setChanged();
+					notifyObservers(args);
+				}
 			}
 			
 			@Override
@@ -193,6 +208,7 @@ public class MainWindow extends Observable implements View {
 					Properties properties = (Properties) Propertieswin.getNewCreatedClass();
 					setChanged();
 					notifyObservers(properties);
+					
 				}
 			}
 			
@@ -209,10 +225,11 @@ public class MainWindow extends Observable implements View {
 		mazeWindow.run();
 	}
 	
+	@SuppressWarnings("unchecked")
 	@Override
 	public void displayArrayList(ArrayList<?> arrList) {
 	try{
-			mazeWindow.showSolution((ArrayList<State<Position>>) arrList);
+			this.displaySolution((ArrayList<State<Position>>) arrList);
 		}
 		catch(IllegalFormatException e){
 			e.printStackTrace();
@@ -241,6 +258,8 @@ public class MainWindow extends Observable implements View {
 
 	@Override
 	public void displayString(String str) {
+		if(str == null)
+			return;
 		// case new maze generated
 		if(str.startsWith("the maze ") && str.endsWith(" has created")){
 			String mazeName = str.split(" ")[2];
@@ -281,17 +300,18 @@ public class MainWindow extends Observable implements View {
 		}
 		else if (str.startsWith("the maze ") && str.contains(" has been loaded from file ")) {
 			String mazeName = str.split(" ")[2];
+			this.mazeWindow.setMazeName(mazeName);
 			ArrayList<String> args = new ArrayList<String>();
-			args.add("get start position");
+			args.add("display");
 			args.add(mazeName);
 			setChanged();
 			notifyObservers(args);
-			
 		}
 		else if (str.startsWith("the start poistion for maze ")) {
 			String mazeName = str.split(" ")[5];
 			int indexOfPositionStringStarts = str.lastIndexOf("{");
-			String position = str.substring(indexOfPositionStringStarts + 1, indexOfPositionStringStarts + 6);
+			int indexOfPositionStringEnd = str.lastIndexOf("}");
+			String position = str.substring(indexOfPositionStringStarts + 1, indexOfPositionStringEnd);
 			String floor = position.split(",")[0];
 			String row = position.split(",")[1];
 			String column = position.split(",")[2];
@@ -300,10 +320,9 @@ public class MainWindow extends Observable implements View {
 			mazeWindow.setMazeName(mazeName);
 			// requests from Presenter to give the cross by floor of the maze
 			ArrayList<String> args = new ArrayList<String>();
-			args.add("display cross section by");
-			args.add("Y");
-			args.add(floor);
+			args.add("get floor information");
 			args.add(mazeName);
+			args.add(floor);
 			setChanged();
 			notifyObservers(args);
 		}
@@ -328,8 +347,53 @@ public class MainWindow extends Observable implements View {
 
 	@Override
 	public void displaySolution(ArrayList<State<Position>> solution) {
-		mazeWindow.showSolution(solution);
 		
+		for (int i = 0; i <solution.size(); i++) {
+			mazeWindow.moveCharchter(solution.get(i).getState());
+			try {
+				Thread.sleep(200);
+			} catch (InterruptedException e) {
+				e.printStackTrace();
+			}
+			
+			if(i < solution.size() - 1){
+				int currentFloor = solution.get(i).getState().getFloor();
+				int nextFloor = solution.get(i + 1).getState().getFloor();
+				// Case you need to go floor up
+				if (currentFloor + 1 == nextFloor) {
+					ArrayList<String> args = new ArrayList<String>();
+					args.add("move charachter");
+					args.add(mazeWindow.getMazeName());
+					args.add(String.valueOf(mazeWindow.getCharchterPosition().getFloor()));
+					args.add(String.valueOf(mazeWindow.getCharchterPosition().getRow()));
+					args.add(String.valueOf(mazeWindow.getCharchterPosition().getColumn()));
+					args.add("up");
+					System.out.println("Charachter move UP!!! from" + mazeWindow.getCharchterPosition());
+					setChanged();
+					notifyObservers(args);
+				}
+				if (currentFloor - 1 == nextFloor) {
+					ArrayList<String> args = new ArrayList<String>();
+					args.add("move charachter");
+					args.add(mazeWindow.getMazeName());
+					args.add(String.valueOf(mazeWindow.getCharchterPosition().getFloor()));
+					args.add(String.valueOf(mazeWindow.getCharchterPosition().getRow()));
+					args.add(String.valueOf(mazeWindow.getCharchterPosition().getColumn()));
+					args.add("down");
+					System.out.println("Charachter move UP!!! from" + mazeWindow.getCharchterPosition());
+					setChanged();
+					notifyObservers(args);
+				}
+			}
+			
+		}
+		
+	}
+
+	@Override
+	public void displayEror(String eror) {
+		if(eror != null)
+			mazeWindow.displayEror(eror);
 	}
 
 }

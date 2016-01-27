@@ -49,7 +49,11 @@ public interface View {
 	 * @param solution solution of maze {@link ArrayList}
 	 */
 	public void displaySolution(ArrayList<State<Position>> solution);
-	
+	/**
+	 * The function print out an eror
+	 * @param eror String represents a eror
+	 */
+	public void displayEror(String eror);
 	
 }
 

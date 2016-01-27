@@ -2,19 +2,26 @@ package model;
 
 import java.beans.XMLEncoder;
 import java.io.BufferedOutputStream;
+import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.io.PrintWriter;
+import java.net.Socket;
+import java.net.SocketException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Observable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 
 import algorithms.mazeGenerators.Maze3d;
-import algorithms.mazeGenerators.Maze3dGenerator;
-import algorithms.mazeGenerators.MyMaze3dGenerator;
 import algorithms.mazeGenerators.Position;
 import algorithms.search.Astar;
 import algorithms.search.BFS;
@@ -23,22 +30,28 @@ import algorithms.search.MazeManhattanDistance;
 import algorithms.search.Searcher;
 import algorithms.search.Solution;
 import demo.MazeAdapter;
+import io.MyDecompressorInputStream;
 import presenter.Properties;
 
 public class MyModel extends Observable implements Model {
 
 	private HashMap<String, Maze3d> mazeHashMap;
 	private HashMap<String, Solution<Position>> solutionsHashMap;
-	private HashMap<Maze3d, Solution<Position>> cach;
 	private ExecutorService threadPool;
+	Socket theServer;
+	///////////Properties ///////
+	String serverIP = "127.0.0.1" ;
+	int portServerIsListene = 3750;
 	private String defaultSolveAlgorithm;
 	
+	
 	public MyModel(Properties properties) {
-		this.cach = new HashMap<Maze3d, Solution<Position>>();
 		this.mazeHashMap = new HashMap<String, Maze3d>();
 		this.solutionsHashMap = new HashMap<String, Solution<Position>>();
 		this.threadPool = Executors.newFixedThreadPool(properties.getNumOfThreadsInThreadPool());
 		this.defaultSolveAlgorithm = properties.getDefaultSolver();
+		this.serverIP = properties.getIPOfServer();
+		this.portServerIsListene = properties.getPortServerIsListening();
 	}
 	
 	@Override
@@ -55,17 +68,38 @@ public class MyModel extends Observable implements Model {
 		if(mazeHashMap.containsKey(mazeName))
 			throw new Exception("Error! the maze named " + mazeName + " is already exits");
 			
-			Maze3dGenerator mg = new MyMaze3dGenerator();
-			threadPool.execute(new Runnable() {
-				@Override
-				public void run() {
-					mazeHashMap.put(mazeName, mg.generate(column, row, floor));
-					setChanged();
-					notifyObservers("the maze " + mazeName + " has created");
-				}
-			});
-			int a = 3;
-			System.out.println(a);;
+		    // Creats new connection to server
+			theServer = new Socket(serverIP, portServerIsListene);
+			theServer.setSoTimeout(80000);
+			
+			// Define Stream of connection
+			ObjectOutputStream objectToServer = new ObjectOutputStream(theServer.getOutputStream());
+			ObjectInputStream objectFromServer = new ObjectInputStream(theServer.getInputStream());
+			
+			// request from server to generate new maze
+			String str = "generate 3d maze " + mazeName + " " + floor + " " + row + " " + column;
+			objectToServer.writeObject(str);
+			objectToServer.flush();
+			
+			// read maze
+			Maze3d maze = (Maze3d)objectFromServer.readObject();
+			// close connection with the server
+			theServer.close();
+			
+			if(maze != null){
+				// save new maze at hashmap
+				mazeHashMap.put(mazeName, maze);
+				// notify observers
+				setChanged();
+				System.out.println(theServer.isConnected() + "1!!!!!!!!!!!!!");
+				notifyObservers("the maze " + mazeName + " has created");
+			}
+			else{
+				//throw new SocketException("Server is not connect - you got  a kick");
+				System.out.println("maze is null kick!");
+				throw new Exception("Server is not connect - you got  a kick");
+			}
+				
 	}
 
 	@Override
@@ -164,35 +198,42 @@ public class MyModel extends Observable implements Model {
 				notifyObservers("The solution with " + algorithm + "alorithm of maze "+ mazeName +" is ready");
 			}
 			
-			Maze3d maze = mazeHashMap.get(mazeName);
-			Searcher<Position> s;
 			
-			if(!algorithm.equals("BFS") && !algorithm.equals("mazeAirDistance") && !algorithm.equals("mazeManhattanDistance"))
-				 algorithm = this.defaultSolveAlgorithm;
-			
-			switch (algorithm) {
-			case "BFS":
-				s = new BFS<Position>();	
-				break;
-			case "mazeAirDistance":
-				 s = new Astar<Position>(new MazeAirDistance(maze.getGoalPosition()));
-				break;
-			case "mazeManhattanDistance":
-				s = new Astar<Position>(new MazeManhattanDistance(maze.getGoalPosition()));
-				break;
-			default:
-				throw new NullPointerException("There algorithm such " + algorithm + " noe found");
-			}
 				// run solve algorithm in thread
 			threadPool.execute(new Runnable() {
 					@Override
 					public void run() {
-						
-						Solution<Position> sol = s.search(new MazeAdapter(maze));
-						cach.put(mazeHashMap.get(mazeName), sol);
-						solutionsHashMap.put(mazeName, sol);
-						setChanged();
-						notifyObservers("solution for " + mazeName +" is ready");
+						try{
+							
+							// Creats new connection to server
+							theServer = new Socket(serverIP, portServerIsListene);
+							theServer.setSoTimeout(800000);
+							
+							// Define Stream of connection
+							ObjectOutputStream objectToServer = new ObjectOutputStream(theServer.getOutputStream());
+							ObjectInputStream objectFromServer = new ObjectInputStream(theServer.getInputStream());
+							
+							// request from server to solve the maze
+							String str = "solve " + mazeName + " " + algorithm;
+							objectToServer.writeObject(str);
+							objectToServer.flush();
+							
+							// read maze
+							@SuppressWarnings("unchecked")
+							Solution<Position> solution = (Solution<Position>)objectFromServer.readObject();
+							// close connection with the server
+							theServer.close();
+							// save new solution at hashmap
+							solutionsHashMap.put(mazeName, solution);
+							// notify pressenter
+							setChanged();
+							notifyObservers("solution for " + mazeName +" is ready");
+						}catch(IOException e){
+							e.printStackTrace();
+						} catch (ClassNotFoundException e) {
+							// TODO Auto-generated catch block
+							e.printStackTrace();
+						};
 					}
 				});
 	}
@@ -206,7 +247,6 @@ public class MyModel extends Observable implements Model {
 		setChanged();
 		notifyObservers(this.solutionsHashMap.get(solutionName).getSolutionList());
 	}
-
 
 	@Override
 	public void getPossibleMovesFromPosition(String name, Position pos, String wantedMove) throws NullPointerException {
@@ -245,19 +285,13 @@ public class MyModel extends Observable implements Model {
 
 	@Override
 	public void saveAndUpdateProperties(Properties properties) throws Exception {
-		XMLEncoder coder = null;
 		
-		try {
-			coder = new XMLEncoder(new BufferedOutputStream(new FileOutputStream("Properties.xml")));
-			coder.writeObject(properties);
-			this.defaultSolveAlgorithm = properties.getDefaultSolver();
-		} catch (FileNotFoundException e) {
-			setChanged();
-			notifyObservers("Can't Save Properties File");
-		}
-		finally {
-			coder.close();
-		}
+		this.defaultSolveAlgorithm = properties.getDefaultSolver();
+		this.portServerIsListene = properties.getPortServerIsListening();
+		this.serverIP = properties.getIPOfServer();
+		setChanged();
+		notifyObservers("Properties Updated Successfully");
+		
 	}
 
 	@Override
@@ -268,5 +302,23 @@ public class MyModel extends Observable implements Model {
 		int [][]floorCrossSectionWithInfo = mazeHashMap.get(name).floorCrossSectionInfo(index);
 		setChanged();
 		notifyObservers(floorCrossSectionWithInfo);
+	}
+
+	@Override
+	public void exit() {
+		try {
+			threadPool.shutdown();
+			// if not  executor terminated 
+			if (!threadPool.awaitTermination(3, TimeUnit.SECONDS)) {
+				threadPool.shutdownNow();
+				System.out.println("Thread pool has been shut down NOW");
+			}
+			System.out.println("Thread pool has been shut down: " + threadPool.isShutdown());
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		
+		setChanged();
+		notifyObservers("exit");
 	}
 }

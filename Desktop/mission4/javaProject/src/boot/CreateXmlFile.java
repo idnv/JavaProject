@@ -15,7 +15,9 @@ public class CreateXmlFile {
 		Properties properties = new Properties();
 		properties.setNumOfThreadsInThreadPool(4);
 		properties.setDefaultSolver("mazeManhattanDistance");
-		properties.setView("GUI");
+		properties.setUI("GUI");
+		properties.setIPOfServer("127.0.0.1");
+		properties.setPortServerIsListening(3750);
 		
 		try {
 			xmlEncoder = new XMLEncoder(new BufferedOutputStream(new FileOutputStream("properties.xml")));

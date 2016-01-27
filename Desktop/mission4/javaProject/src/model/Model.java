@@ -108,4 +108,8 @@ public interface Model {
 	 * @param index index of cross {@link Integer}
 	 */
 	public void getCrossByFloorWithInformation(String name, int index) throws IndexOutOfBoundsException, Exception;
+	/**
+	 * Close all threds
+	 */
+	public void exit();
 }

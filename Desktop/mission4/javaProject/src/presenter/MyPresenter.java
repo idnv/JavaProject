@@ -32,6 +32,7 @@ public class MyPresenter implements Presenter {
 		commands.put("update start position", new UpdateStartPositionCommand(model, view));
 		commands.put("get start position", new GetStartPositionCommand(model, view));
 		commands.put("get floor information", new GetCrossSectionByFloorWithInformation(model, view));
+		commands.put("exit", new ExitCommand(model, view));
 	}
 	@SuppressWarnings("unchecked")
 	@Override
@@ -45,11 +46,17 @@ public class MyPresenter implements Presenter {
 					((ArrayList<String>) arg).toArray(arrArgs);
 					command.doCommand(arrArgs);
 				} catch (Exception e) {
-					e.printStackTrace();
+					//e.printStackTrace();
+					view.displayEror(e.getMessage());
 				}
 			}
 			if(arg instanceof Properties){
-				//TODO complete
+				try {
+					model.saveAndUpdateProperties((Properties) arg);
+				} catch (Exception e) {
+					e.printStackTrace();
+					view.displayEror(e.getMessage());
+				}
 			}
 		}
 		if(o == model){
